@@ -9,7 +9,7 @@
         </p>
     </header>
 
-    <form name="createPasskey" method="post" action="/" class="mt-6 space-y-6">
+    <form x-data="registerPasskey" x-on:submit.prevent="register()" name="createPasskey" method="post" action="/" class="mt-6 space-y-6">
         @csrf
 
         <div>
@@ -26,20 +26,26 @@
     <div class="mt-6">
         <h3 class="font-medium text-gray-900">{{ __('Your Passkeys') }}</h3>
         <ul class="mt-2">
-            <li class="px-2 py-2 flex justify-between items-center">
-                <div class="flex flex-col">
-                    <span class="font-semibold">1Password</span>
-                    <span class="font-thin text-sm text-gray-600">Added 2 weeks ago</span>
-                </div>
+            @forelse($passkeys as $passkey)
+                <li class="px-2 py-2 flex justify-between items-center">
+                    <div class="flex flex-col">
+                        <span class="font-semibold">{{$passkey->name}}</span>
+                        <span class="font-thin text-sm text-gray-600">{{$passkey->created_at->diffForHumans()}}</span>
+                    </div>
 
-                <form method="post" action="/">
-                    @csrf
-                    @method('DELETE')
+                    <form method="post" action="{{route('passkeys.destroy', $passkey)}}">
+                        @csrf
+                        @method('DELETE')
 
-                    <input type="hidden" name="id" value="">
-                    <x-danger-button class="">Remove</x-danger-button>
-                </form>
-            </li>
+                        <input type="hidden" name="id" value="">
+                        <x-danger-button class="">Remove</x-danger-button>
+                    </form>
+                </li>
+            @empty
+                <li class="px-2 py-2 flex justify-between items-center">
+                    No data
+                </li>
+            @endforelse
         </ul>
     </div>
 </section>
