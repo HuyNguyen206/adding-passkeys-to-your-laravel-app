@@ -1,4 +1,4 @@
-<section>
+<section id="managePasskeys">
     <header>
         <h2 class="text-lg font-medium text-gray-900">
             {{ __('Manage Passkeys') }}
@@ -9,13 +9,14 @@
         </p>
     </header>
 
-    <form x-data="registerPasskey" x-on:submit.prevent="register()" name="createPasskey" method="post" action="/" class="mt-6 space-y-6">
+    <form x-data="registerPasskey" method="post" action="{{route('passkeys.store')}}" x-on:submit.prevent="register($el)" name="createPasskey" method="post" action="/" class="mt-6 space-y-6">
         @csrf
 
         <div>
             <x-input-label for="create_passkey_passkey_name" :value="__('Passkey Name')"/>
             <x-text-input id="create_passkey_passkey_name" name="name" class="mt-1 block w-full"/>
             <x-input-error :messages="$errors->createPasskey->get('name')" class="mt-2"/>
+{{--            <x-input-error :messages="$errors->createPasskey->get('passkey')" class="mt-2"/>--}}
         </div>
 
         <div class="flex items-center gap-4">
