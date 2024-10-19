@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Webauthn\AuthenticatorSelectionCriteria;
 use Webauthn\CeremonyStep\CeremonyStepManagerFactory;
 use Webauthn\PublicKeyCredentialCreationOptions;
+use Webauthn\PublicKeyCredentialRequestOptions;
 use Webauthn\PublicKeyCredentialRpEntity;
 use Webauthn\PublicKeyCredentialUserEntity;
 
@@ -16,6 +17,10 @@ class PasskeyController extends Controller
 {
     public function registerOptions(Request $request)
     {
+        $request->validateWithBag('createPasskey', [
+            'name' => ['required', 'string', 'max:255'],
+        ]);
+
         $options = new PublicKeyCredentialCreationOptions(
             rp: new PublicKeyCredentialRpEntity(
                 name: config('app.name'),
@@ -35,6 +40,19 @@ class PasskeyController extends Controller
         );
 
         Session::flash('passkey-registration-options', $options);
+
+        return $options;
+    }
+
+    public function authenticationOptions()
+    {
+        $options = new PublicKeyCredentialRequestOptions(
+            challenge: Str::random(),
+            rpId: parse_url(config('app.url'), PHP_URL_HOST),
+        );
+
+        Session::flash('passkey-authentication-options', $options);
+
 
         return $options;
     }
