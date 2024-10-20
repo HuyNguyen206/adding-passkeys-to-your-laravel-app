@@ -18,4 +18,6 @@ Route::middleware('auth')->group(function () {
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
+Route::post('/passkeys/authenticate', [\App\Http\Controllers\PasskeyController::class, 'authenticate'])->name('passkeys.authenticate');
+
 require __DIR__.'/auth.php';
