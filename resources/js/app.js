@@ -29,8 +29,10 @@ document.addEventListener('alpine:init', () => {
                 return;
             }
 
+            let passkey;
+
             try {
-                var passkey = await startRegistration(options.data)
+                passkey = await startRegistration(options.data)
             } catch (e) {
                 console.log(e)
                 this.errors = {name: [e]}
@@ -45,10 +47,27 @@ document.addEventListener('alpine:init', () => {
     }))
 
     Alpine.data('authenticatePasskey', () => ({
-        async authenticate(form) {
-            const options = await axios.get('/api/passkeys/authenticate')
-            console.log(options.data)
-            const answer = await startAuthentication(options.data)
+        showPasswordField: !browserSupportsWebAuthn(),
+        email: '',
+        async authenticate(form, manualSubmission = false) {
+            if (this.showPasswordField) {
+                return form.submit();
+            }
+
+            let answer;
+            try {
+                const options = await axios.get('/api/passkeys/authenticate', {
+                    params: {email: this.email}
+                })
+                console.log(options.data)
+                answer = await startAuthentication(options.data)
+            } catch (e) {
+                if (manualSubmission) {
+                    this.showPasswordField = true;
+                }
+
+                return;
+            }
 
             form.action = '/passkeys/authenticate';
             form.addEventListener('formdata', ({formData}) => {
